@@ -134,6 +134,46 @@ app.delete('/products/:id', async (req, res) => {
     }
 });
 
+// ✅ Get all suppliers
+app.get('/suppliers', async (req, res) => {
+    try {
+        const result = await pool.query("SELECT supplier_id, supplier_name, supplier_email, supplier_phone FROM suppliers");
+        res.json(result.rows);
+    } catch (error) {
+        console.error("🚨 Error fetching suppliers:", error);
+        res.status(500).json({ error: "Error fetching suppliers from the database." });
+    }
+});
+
+// ✅ Add a new supplier
+app.post('/suppliers', async (req, res) => {
+    const { supplier_name, supplier_email, supplier_phone } = req.body;
+    try {
+        const result = await pool.query(
+            "INSERT INTO suppliers (supplier_name, supplier_email, supplier_phone) VALUES ($1, $2, $3) RETURNING *",
+            [supplier_name, supplier_email, supplier_phone]
+        );
+        res.json(result.rows[0]); // Return the added supplier
+    } catch (error) {
+        console.error("🚨 Error adding supplier:", error);
+        res.status(500).json({ error: "Failed to add supplier" });
+    }
+});
+
+
+// ✅ Delete a supplier
+app.delete('/suppliers/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await pool.query("DELETE FROM suppliers WHERE supplier_id = $1", [id]);
+        res.json({ message: "Supplier deleted successfully" });
+    } catch (error) {
+        console.error("🚨 Error deleting supplier:", error);
+        res.status(500).json({ error: "Failed to delete supplier" });
+    }
+});
+
+
 
 // ✅ Chatbot API with Multilingual Support
 app.post('/chatbot', async (req, res) => {
