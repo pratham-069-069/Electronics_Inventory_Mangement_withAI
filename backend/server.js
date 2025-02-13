@@ -173,6 +173,98 @@ app.delete('/suppliers/:id', async (req, res) => {
     }
 });
 
+app.get('/dashboard-stats', async (req, res) => {
+    try {
+        const totalProducts = await pool.query("SELECT COUNT(*) AS count FROM products");
+        const activeSuppliers = await pool.query("SELECT COUNT(*) AS count FROM suppliers");
+        const lowStockAlerts = await pool.query("SELECT COUNT(*) AS count FROM inventory_alerts WHERE alert_type = 'low stock'");
+        const totalSales = await pool.query("SELECT SUM(total_price) AS sum FROM sales");
+
+        res.json({
+            totalProducts: totalProducts.rows[0].count,
+            activeSuppliers: activeSuppliers.rows[0].count,
+            lowStockAlerts: lowStockAlerts.rows[0].count,
+            totalSales: totalSales.rows[0].sum || 0
+        });
+    } catch (error) {
+        console.error("Error fetching dashboard stats:", error);
+        res.status(500).json({ error: "Failed to fetch dashboard data" });
+    }
+});
+
+// ✅ Get all sales
+app.get('/sales', async (req, res) => {
+    try {
+        const result = await pool.query(
+            "SELECT sales_id, product_id, quantity_sold, total_price, sold_by_user_id, sale_date FROM sales ORDER BY sale_date DESC"
+        );
+        res.json(result.rows);
+    } catch (error) {
+        console.error("🚨 Error fetching sales:", error);
+        res.status(500).json({ error: "Error fetching sales from the database." });
+    }
+});
+
+// ✅ Add a new sale
+app.post('/sales', async (req, res) => {
+    const { product_id, quantity_sold, total_price, sold_by_user_id } = req.body;
+
+    try {
+        // 1️⃣ Reduce stock quantity
+        const updateStock = await pool.query(`
+            UPDATE products 
+            SET stock_quantity = stock_quantity - $1 
+            WHERE product_id = $2 
+            RETURNING stock_quantity;
+        `, [quantity_sold, product_id]);
+
+        if (updateStock.rows.length === 0) {
+            return res.status(400).json({ error: "Product not found" });
+        }
+
+        const newStock = updateStock.rows[0].stock_quantity;
+
+        // 2️⃣ Insert the sale into sales table
+        const sale = await pool.query(`
+            INSERT INTO sales (product_id, quantity_sold, total_price, sold_by_user_id) 
+            VALUES ($1, $2, $3, $4) RETURNING *;
+        `, [product_id, quantity_sold, total_price, sold_by_user_id]);
+
+        // 3️⃣ Check if stock is below threshold and create an alert
+        const thresholdCheck = await pool.query(`
+            SELECT threshold_quantity FROM inventory_alerts WHERE product_id = $1;
+        `, [product_id]);
+
+        if (thresholdCheck.rows.length > 0 && newStock <= thresholdCheck.rows[0].threshold_quantity) {
+            await pool.query(`
+                INSERT INTO inventory_alerts (product_id, alert_type, threshold_quantity) 
+                VALUES ($1, 'low stock', $2) 
+                ON CONFLICT (product_id) DO UPDATE 
+                SET alert_date = CURRENT_TIMESTAMP;
+            `, [product_id, thresholdCheck.rows[0].threshold_quantity]);
+        }
+
+        res.json(sale.rows[0]);
+    } catch (error) {
+        console.error("🚨 Error processing sale:", error);
+        res.status(500).json({ error: "Failed to process sale" });
+    }
+});
+
+
+app.get('/inventory-alerts', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT alert_id, product_id, alert_type, threshold_quantity, alert_date 
+            FROM inventory_alerts 
+            ORDER BY alert_date DESC
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        console.error("🚨 Error fetching inventory alerts:", error);
+        res.status(500).json({ error: "Error fetching inventory alerts from database." });
+    }
+});
 
 
 // ✅ Chatbot API with Multilingual Support
