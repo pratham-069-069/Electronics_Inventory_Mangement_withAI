@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { FiAlertTriangle } from "react-icons/fi";
+import { Button } from "../components/ui/button";
 
 const InventoryAlerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch inventory alerts from backend
   useEffect(() => {
     fetchInventoryAlerts();
   }, []);
 
   const fetchInventoryAlerts = async () => {
     try {
-      const response = await fetch("http://localhost:5000/inventory-alerts"); // Adjust URL if needed
+      const response = await fetch("http://localhost:5000/inventory-alerts");
       if (!response.ok) throw new Error("Failed to fetch inventory alerts");
 
       const data = await response.json();
@@ -23,6 +23,17 @@ const InventoryAlerts = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const acknowledgeAlert = async (alertId) => {
+    try {
+      await fetch(`http://localhost:5000/inventory-alerts/${alertId}/acknowledge`, {
+        method: "PATCH",
+      });
+      setAlerts(alerts.filter((alert) => alert.alert_id !== alertId));
+    } catch (err) {
+      console.error("Error acknowledging alert:", err);
     }
   };
 
@@ -40,6 +51,13 @@ const InventoryAlerts = () => {
             <AlertDescription>
               {alert.alert_type} - Threshold: {alert.threshold_quantity}
             </AlertDescription>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => acknowledgeAlert(alert.alert_id)}
+            >
+              Acknowledge
+            </Button>
           </Alert>
         ))
       ) : (

@@ -2,34 +2,25 @@ import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/Table";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "../components/ui/Dialog";
-
-
-<DialogContent>
-  <DialogHeader>
-    <DialogTitle>Add New Product</DialogTitle>
-    <DialogDescription>Enter product details below:</DialogDescription>
-  </DialogHeader>
-</DialogContent>
-
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "../components/ui/Dialog";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [newProduct, setNewProduct] = useState({
     product_name: "",
-    product_category: "",
-    product_price: "",
-    stock_quantity: ""
+    category_id: "",
+    unit_price: "",
+    stock_quantity: "",
   });
 
-  // Fetch products from backend API
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -45,22 +36,15 @@ const Products = () => {
     }
   };
 
-  // Filter products based on search term
-  const filteredProducts = products.filter((product) =>
-    product.product_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleDelete = async (id) => {
+  const fetchCategories = async () => {
     try {
-      await fetch(`http://localhost:5000/products/${id}`, { method: "DELETE" });
-      setProducts(products.filter((product) => product.product_id !== id));
-    } catch (error) {
-      console.error("Error deleting product:", error);
+      const response = await fetch("http://localhost:5000/product-categories");
+      if (!response.ok) throw new Error("Failed to fetch categories");
+      const data = await response.json();
+      setCategories(data);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
     }
-  };
-
-  const handleEdit = (id) => {
-    alert(`Edit product with ID: ${id}`);
   };
 
   const handleAddProduct = async () => {
@@ -68,19 +52,21 @@ const Products = () => {
       const response = await fetch("http://localhost:5000/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProduct)
+        body: JSON.stringify(newProduct),
       });
-
       if (!response.ok) throw new Error("Failed to add product");
-      
       const addedProduct = await response.json();
-      setProducts([...products, addedProduct]); // Update UI
+      setProducts([...products, addedProduct]);
       setShowModal(false);
-      setNewProduct({ product_name: "", product_category: "", product_price: "", stock_quantity: "" });
+      setNewProduct({ product_name: "", category_id: "", unit_price: "", stock_quantity: "" });
     } catch (error) {
       console.error("Error adding product:", error);
     }
   };
+
+  const filteredProducts = products.filter((product) =>
+    product.product_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) return <p>Loading products...</p>;
   if (error) return <p className="text-red-600">Error: {error}</p>;
@@ -91,15 +77,12 @@ const Products = () => {
         <h1 className="text-3xl font-bold">Product Management</h1>
         <Button onClick={() => setShowModal(true)}>Add New Product</Button>
       </div>
-      <div className="flex space-x-2">
-        <Input
-          className="max-w-sm"
-          placeholder="Search products..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <Button variant="outline">Search</Button>
-      </div>
+      <Input
+        className="max-w-sm"
+        placeholder="Search products..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       <Table>
         <TableHeader>
           <TableRow>
@@ -108,7 +91,6 @@ const Products = () => {
             <TableHead>Category</TableHead>
             <TableHead>Stock</TableHead>
             <TableHead>Price</TableHead>
-            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -117,31 +99,20 @@ const Products = () => {
               <TableRow key={product.product_id}>
                 <TableCell>{product.product_id}</TableCell>
                 <TableCell>{product.product_name}</TableCell>
-                <TableCell>{product.product_category || "N/A"}</TableCell>
+                <TableCell>{product.category_name || "N/A"}</TableCell>
                 <TableCell>{product.stock_quantity}</TableCell>
-                <TableCell>${Number(product.product_price).toFixed(2)}</TableCell>
-
-                <TableCell>
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(product.product_id)}>
-                    Edit
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-red-600" onClick={() => handleDelete(product.product_id)}>
-                    Delete
-                  </Button>
-                </TableCell>
+                <TableCell>${Number(product.unit_price).toFixed(2)}</TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan="6" className="text-center py-4">
+              <TableCell colSpan="5" className="text-center py-4">
                 No products found.
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-
-      {/* Add New Product Modal */}
       {showModal && (
         <Dialog open={showModal} onOpenChange={setShowModal}>
           <DialogContent>
@@ -154,16 +125,22 @@ const Products = () => {
                 value={newProduct.product_name}
                 onChange={(e) => setNewProduct({ ...newProduct, product_name: e.target.value })}
               />
-              <Input
-                placeholder="Category"
-                value={newProduct.product_category}
-                onChange={(e) => setNewProduct({ ...newProduct, product_category: e.target.value })}
-              />
+              <select
+                value={newProduct.category_id}
+                onChange={(e) => setNewProduct({ ...newProduct, category_id: e.target.value })}
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category.category_id} value={category.category_id}>
+                    {category.category_name}
+                  </option>
+                ))}
+              </select>
               <Input
                 type="number"
                 placeholder="Price"
-                value={newProduct.product_price}
-                onChange={(e) => setNewProduct({ ...newProduct, product_price: e.target.value })}
+                value={newProduct.unit_price}
+                onChange={(e) => setNewProduct({ ...newProduct, unit_price: e.target.value })}
               />
               <Input
                 type="number"

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { FiBox, FiTruck, FiAlertCircle, FiDollarSign } from "react-icons/fi";
+import { FiBox, FiTruck, FiAlertCircle, FiDollarSign, FiShoppingCart, FiUsers, FiFileText } from "react-icons/fi";
 
 const DashboardCard = ({ title, value, icon: Icon }) => (
   <Card className="w-full hover:shadow-lg transition-shadow">
     <CardHeader className="flex flex-row items-center justify-between p-6">
-      <CardTitle className="text-lg font-semibold text-white-500">{title}</CardTitle>
-      <Icon className="w-6 h-6 text-white-500" />
+      <CardTitle className="text-lg font-semibold text-gray-800">{title}</CardTitle>
+      <Icon className="w-6 h-6 text-gray-800" />
     </CardHeader>
     <CardContent className="p-6 pt-0">
-      <div className="text-3xl font-bold text-white-500">{value}</div>
+      <div className="text-3xl font-bold text-gray-800">{value}</div>
     </CardContent>
   </Card>
 );
@@ -19,7 +19,10 @@ const Dashboard = () => {
     totalProducts: 0,
     activeSuppliers: 0,
     lowStockAlerts: 0,
-    totalSales: 0
+    totalSales: 0,
+    totalOrders: 0,
+    totalUsers: 0,
+    totalReports: 0,
   });
 
   useEffect(() => {
@@ -46,6 +49,9 @@ const Dashboard = () => {
           <DashboardCard title="Active Suppliers" value={stats.activeSuppliers} icon={FiTruck} />
           <DashboardCard title="Low Stock Alerts" value={stats.lowStockAlerts} icon={FiAlertCircle} />
           <DashboardCard title="Total Sales" value={`$${stats.totalSales.toLocaleString()}`} icon={FiDollarSign} />
+          <DashboardCard title="Total Orders" value={stats.totalOrders} icon={FiShoppingCart} />
+          <DashboardCard title="Total Users" value={stats.totalUsers} icon={FiUsers} />
+          <DashboardCard title="Reports Generated" value={stats.totalReports} icon={FiFileText} />
         </div>
       </div>
     </div>

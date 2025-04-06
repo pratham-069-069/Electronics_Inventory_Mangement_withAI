@@ -1,10 +1,19 @@
 import { Link, useLocation } from "react-router-dom";
-import { FiHome, FiBox, FiTruck, FiAlertCircle, FiDollarSign, FiLogOut } from "react-icons/fi";
-import { Button } from "./ui/button"; 
-
+import {
+  FiHome,
+  FiBox,
+  FiTruck,
+  FiAlertCircle,
+  FiDollarSign,
+  FiFileText,
+  FiShoppingCart,
+  FiUsers,
+  FiLogOut,
+} from "react-icons/fi";
+import { Button } from "./ui/button";
 
 const Sidebar = () => {
-  const location = useLocation()
+  const location = useLocation();
 
   const navItems = [
     { icon: FiHome, label: "Dashboard", path: "/" },
@@ -12,7 +21,10 @@ const Sidebar = () => {
     { icon: FiTruck, label: "Suppliers", path: "/suppliers" },
     { icon: FiAlertCircle, label: "Alerts", path: "/alerts" },
     { icon: FiDollarSign, label: "Sales", path: "/sales" },
-  ]
+    { icon: FiShoppingCart, label: "Purchase Orders", path: "/purchase-orders" },
+    { icon: FiFileText, label: "Reports", path: "/reports" },
+    { icon: FiUsers, label: "User Management", path: "/users" },
+  ];
 
   return (
     <aside className="bg-gray-800 text-white w-64 min-h-screen p-4">
@@ -37,8 +49,8 @@ const Sidebar = () => {
         </Button>
       </div>
     </aside>
-  )
-}
+  );
+};
 
 const Layout = ({ children }) => {
   return (
@@ -46,8 +58,7 @@ const Layout = ({ children }) => {
       <Sidebar />
       <main className="flex-1 p-8 overflow-auto">{children}</main>
     </div>
-  )
-}
+  );
+};
 
-export default Layout
-
+export default Layout;

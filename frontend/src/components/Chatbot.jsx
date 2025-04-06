@@ -1,59 +1,55 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "./ui/button"  
-import { Input } from "./ui/input"    
-import { 
-  Card, 
-  CardContent, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "./ui/card"                   
-import { FiMessageSquare } from "react-icons/fi"
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { FiMessageSquare } from "react-icons/fi";
 
 const Chatbot = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState([])
-  const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false) // ⏳ Added loading state
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Function to send message to backend
   const handleSend = async () => {
     if (!input.trim()) return;
     setLoading(true);
-  
+
     const userMessage = { text: input, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-  
+
     try {
       const response = await fetch("http://localhost:5000/chatbot", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: input })
+        body: JSON.stringify({ message: input }),
       });
-  
+
       const data = await response.json();
       let botMessageText = data.reply || "I'm not sure.";
-  
-      // ✅ Frontend Cleanup (Double Check)
+
       botMessageText = botMessageText.replace(/<think>.*?<\/think>/gs, "").trim();
-  
+
       const botMessage = { text: botMessageText, sender: "bot" };
       setMessages((prev) => [...prev, botMessage]);
-  
     } catch (error) {
       console.error("Error fetching chatbot response:", error);
       setMessages((prev) => [...prev, { text: "Error contacting chatbot.", sender: "bot" }]);
     }
-  
+
     setLoading(false);
   };
-  
-  
 
   return (
     <>
@@ -89,7 +85,7 @@ const Chatbot = () => {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type a message..."
                 onKeyPress={(e) => e.key === "Enter" && handleSend()}
-                disabled={loading} // Disable input while loading
+                disabled={loading}
               />
               <Button onClick={handleSend} disabled={loading || !input.trim()}>
                 {loading ? "..." : "Send"}
@@ -99,7 +95,7 @@ const Chatbot = () => {
         </Card>
       )}
     </>
-  )
-}
+  );
+};
 
-export default Chatbot
+export default Chatbot;
