@@ -56,3 +56,58 @@ export const deleteAlert = async (req, res) => {
 
 // Add controllers for creating/updating alert configurations if needed
 // e.g., setThreshold(req, res), deleteAlertConfig(req, res)
+
+
+// --- 👇 ADD THIS NEW FUNCTION ---
+/**
+ * @description Set or update the low stock threshold for a product
+ * @route PUT /api/inventory-alerts/threshold/:productId
+ */
+export const updateThreshold = async (req, res) => {
+    const { productId } = req.params;
+    const { threshold_quantity } = req.body;
+
+    // --- Validation ---
+    if (!productId || isNaN(parseInt(productId))) {
+        return res.status(400).json({ error: 'Valid Product ID parameter is required.' });
+    }
+    // Ensure threshold is a non-negative number
+    const thresholdNum = parseInt(threshold_quantity, 10);
+    if (threshold_quantity === undefined || threshold_quantity === null || isNaN(thresholdNum) || thresholdNum < 0) {
+        return res.status(400).json({ error: 'Valid, non-negative threshold_quantity is required in the request body.' });
+    }
+
+    try {
+        // Use INSERT ON CONFLICT to handle both creating and updating the alert setting
+        const result = await pool.query(
+            `INSERT INTO inventory_alerts (product_id, alert_type, threshold_quantity, alert_date, is_active)
+             VALUES ($1, 'low_stock', $2, CURRENT_TIMESTAMP, true)
+             ON CONFLICT (product_id, alert_type) -- Assumes unique constraint or PK on (product_id, alert_type)
+             DO UPDATE SET
+                threshold_quantity = EXCLUDED.threshold_quantity,
+                alert_date = CURRENT_TIMESTAMP,
+                is_active = true -- Optionally reactivate if previously inactive
+             RETURNING product_id, threshold_quantity, alert_date;`,
+            [productId, thresholdNum]
+        );
+
+        if (result.rows.length === 0) {
+             // This shouldn't happen with INSERT ON CONFLICT unless there's a deeper issue
+             throw new Error("Failed to insert or update threshold.");
+        }
+
+        console.log(`✅ Threshold updated for product ${productId} to ${thresholdNum}`);
+        res.status(200).json({
+            message: `Threshold for product ${productId} set to ${thresholdNum}.`,
+            updatedAlert: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error(`🚨 Error updating threshold for product ${productId}:`, error);
+         if (error.code === '23503') { // Foreign key violation (product_id doesn't exist)
+            return res.status(404).json({ error: `Product with ID ${productId} not found.` });
+        }
+        res.status(500).json({ error: "Failed to update threshold due to an internal error." });
+    }
+};
+// --- End of new function ---

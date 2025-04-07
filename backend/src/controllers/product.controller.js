@@ -2,16 +2,20 @@ import pool from '../config/db.js';
 
 export const getAllProducts = async (req, res) => {
     try {
-        // Join with categories to get category name
+        // ✅ *** UPDATED QUERY: LEFT JOIN inventory_alerts to get threshold ***
         const result = await pool.query(`
             SELECT
                 p.product_id, p.category_id, pc.category_name, p.product_name,
-                p.description, p.unit_price, p.current_stock, p.created_at
+                p.description, p.unit_price, p.current_stock, p.created_at,
+                -- Select threshold, default to NULL if no alert setting exists
+                ia.threshold_quantity
             FROM products p
             LEFT JOIN product_categories pc ON p.category_id = pc.category_id
+            -- Join specifically for low_stock alert type
+            LEFT JOIN inventory_alerts ia ON p.product_id = ia.product_id AND ia.alert_type = 'low_stock'
             ORDER BY p.product_name
         `);
-        res.json(result.rows);
+        res.status(200).json(result.rows);
     } catch (error) {
         console.error("🚨 Error fetching products:", error);
         res.status(500).json({ error: "Error fetching products from the database." });
