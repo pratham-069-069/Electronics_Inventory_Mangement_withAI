@@ -11,6 +11,8 @@ import Chatbot from "./components/Chatbot.jsx";
 import PurchaseOrders from "./pages/PurchaseOrders.jsx";
 import Users from "./pages/Users.jsx";
 import Billing from "./pages/Billing.jsx"; // <-- ADD
+import Returns from "./pages/Returns.jsx"; // <-- Import Returns page
+
 import { useState } from "react";
 
 const App = () => {
@@ -43,6 +45,7 @@ const App = () => {
                                     <Route path="/billing" element={<Billing />} /> {/* <-- ADD */}
                                     <Route path="/purchase-orders" element={<PurchaseOrders />} />
                                     <Route path="/users" element={<Users />} />
+                                    <Route path="/returns" element={<Returns />} /> {/* <-- Add Returns Route */}
                                     <Route path="*" element={<div className="p-6"><h2>404 Page Not Found</h2></div>} />
                                 </Routes>
                                 <Chatbot />

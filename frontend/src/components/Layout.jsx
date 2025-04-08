@@ -2,7 +2,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom"; // Added useN
 import {
   FiHome, FiBox, FiTruck, FiAlertCircle, FiDollarSign,
   FiCreditCard, // Billing Icon
-  FiShoppingCart, FiUsers, FiLogOut
+  FiShoppingCart, FiUsers, FiLogOut ,
+  FiCornerUpLeft 
   // Removed: FiFileText (Reports), FiActivity (Stock Log), FiCornerUpLeft (Returns)
   // Add back icons if you re-implement those features
 } from "react-icons/fi";
@@ -22,6 +23,8 @@ const Sidebar = ({ setIsAuthenticated }) => { // Accept setIsAuthenticated if lo
     { icon: FiShoppingCart, label: "Purchase Orders", path: "/purchase-orders" },
     // { icon: FiFileText, label: "Reports", path: "/reports" }, // Reports Link Removed
     { icon: FiUsers, label: "User Management", path: "/users" },
+    { icon: FiCornerUpLeft, label: "Returns", path: "/returns" }, // <-- Add Returns Link
+
   ];
 
   // Handle Logout
