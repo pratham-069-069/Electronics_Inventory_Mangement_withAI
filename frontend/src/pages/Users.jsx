@@ -212,66 +212,145 @@ const Users = () => {
         </Table>
       </div>
 
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
-            <DialogDescription>
-              Enter user details. Email must be unique. Password is required.
-            </DialogDescription>
-          </DialogHeader>
-          {/* Form starts here */}
-          <form onSubmit={handleAddUser} className="grid gap-4 py-4">
-             {addError && (
-                <div className="col-span-2 p-3 bg-red-100 border border-red-300 text-red-800 rounded text-sm">
-                    {addError}
-                </div>
-             )}
-             {/* Grid layout for form fields */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="full_name" className="text-right">Name *</Label>
-              <Input id="full_name" name="full_name" value={newUser.full_name} onChange={handleInputChange} className="col-span-3" required />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">Email *</Label>
-              <Input id="email" name="email" type="email" placeholder="user@example.com" value={newUser.email} onChange={handleInputChange} className="col-span-3" required />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="password_hash" className="text-right">Password *</Label>
-              <Input id="password_hash" name="password_hash" type="password" placeholder="Enter initial password" value={newUser.password_hash} onChange={handleInputChange} className="col-span-3" required />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="phone_number" className="text-right">Phone</Label>
-              <Input id="phone_number" name="phone_number" type="tel" value={newUser.phone_number} onChange={handleInputChange} className="col-span-3" />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-               <Label htmlFor="role" className="text-right">Role *</Label>
-               <select
-                 id="role"
-                 name="role"
-                 value={newUser.role}
-                 onChange={handleInputChange}
-                 className="col-span-3 border rounded px-3 py-2 bg-white"
-                 required
-               >
-                 <option value="employee">Employee</option>
-                 <option value="manager">Manager</option>
-                 <option value="admin">Admin</option>
-               </select>
-             </div>
-            {/* Footer with buttons inside the form */}
-            <DialogFooter className="col-span-full"> {/* Ensure footer spans columns if needed, or place after form grid */}
-              <DialogClose asChild>
-                <Button type="button" variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button type="submit" disabled={isAdding}>
-                {isAdding ? <FiLoader className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {isAdding ? "Adding..." : "Add User"}
-              </Button>
-            </DialogFooter>
-          </form> {/* Form ends here */}
-        </DialogContent>
-      </Dialog>
+      {/* Add New User Modal - Dark Theme */}
+<Dialog open={showModal} onOpenChange={setShowModal}>
+  {/* Dark background for the entire modal content */}
+  <DialogContent className="sm:max-w-md bg-gray-900 text-gray-200 rounded-lg shadow-xl overflow-hidden"> {/* Changed max-width slightly */}
+
+    {/* Header with dark background, slightly lighter border */}
+    <DialogHeader className="px-6 py-5 bg-gray-800 border-b border-gray-700">
+      <DialogTitle className="text-lg font-medium leading-6 text-white">
+        Add New User
+      </DialogTitle>
+      <DialogDescription className="mt-1 text-sm text-gray-400">
+        Enter user details. Email must be unique. Password is required.
+      </DialogDescription>
+    </DialogHeader>
+
+    {/* Form with specific styling for dark theme */}
+    {/* Using space-y for simpler vertical layout */}
+    <form id="add-user-form" onSubmit={handleAddUser} className="px-6 py-6 space-y-5">
+
+      {/* Error Message for dark theme */}
+      {addError && (
+          <div className="p-3 bg-red-900 bg-opacity-50 border border-red-500 text-red-200 rounded-md text-sm font-medium">
+              {addError}
+          </div>
+      )}
+
+      {/* Field: Full Name */}
+      <div>
+        <Label htmlFor="full_name" className="block text-sm font-medium text-gray-300 mb-1"> {/* Lighter label */}
+          Name <span className="text-red-400">*</span> {/* Lighter required star */}
+        </Label>
+        <Input
+          id="full_name"
+          name="full_name"
+          value={newUser.full_name}
+          onChange={handleInputChange}
+          // Dark input style
+          className="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder:text-gray-400"
+          required
+        />
+      </div>
+
+      {/* Field: Email */}
+      <div>
+        <Label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+          Email <span className="text-red-400">*</span>
+        </Label>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="user@example.com"
+          value={newUser.email}
+          onChange={handleInputChange}
+          className="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder:text-gray-400"
+          required
+        />
+      </div>
+
+      {/* Field: Password */}
+      <div>
+        <Label htmlFor="password_hash" className="block text-sm font-medium text-gray-300 mb-1">
+          Password <span className="text-red-400">*</span>
+        </Label>
+        <Input
+          id="password_hash"
+          name="password_hash"
+          type="password"
+          placeholder="Enter initial password"
+          value={newUser.password_hash}
+          onChange={handleInputChange}
+          className="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder:text-gray-400"
+          required
+        />
+      </div>
+
+      {/* Field: Phone Number */}
+      <div>
+        <Label htmlFor="phone_number" className="block text-sm font-medium text-gray-300 mb-1">
+          Phone
+        </Label>
+        <Input
+          id="phone_number"
+          name="phone_number"
+          type="tel"
+          placeholder="+1 123 456 7890"
+          value={newUser.phone_number}
+          onChange={handleInputChange}
+          className="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder:text-gray-400"
+        />
+      </div>
+
+      {/* Field: Role */}
+      <div>
+        <Label htmlFor="role" className="block text-sm font-medium text-gray-300 mb-1">
+          Role <span className="text-red-400">*</span>
+        </Label>
+        <select
+          id="role"
+          name="role"
+          value={newUser.role}
+          onChange={handleInputChange}
+          // Dark theme select styling
+          className="block w-full pl-3 pr-10 py-2 text-base bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          required
+        >
+          {/* Style options for dark theme */}
+          <option value="employee" className="text-white bg-gray-700">Employee</option>
+          <option value="manager" className="text-white bg-gray-700">Manager</option>
+          <option value="admin" className="text-white bg-gray-700">Admin</option>
+        </select>
+      </div>
+
+      {/* Footer outside the main form content, within the DialogContent */}
+      <DialogFooter className="px-6 py-4 bg-gray-800 border-t border-gray-700 flex justify-end space-x-3 mt-6"> {/* Added margin-top */}
+        <DialogClose asChild>
+          {/* Outline button styled for dark theme */}
+          <Button
+            type="button"
+            variant="outline"
+            className="border-gray-600 bg-transparent text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500"
+          >
+            Cancel
+          </Button>
+        </DialogClose>
+        {/* Primary button */}
+        <Button
+          type="submit"
+          form="add-user-form" // Link button to the form
+          disabled={isAdding}
+          className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 disabled:opacity-50"
+        >
+          {isAdding && <FiLoader className="mr-2 h-4 w-4 animate-spin" />}
+          {isAdding ? "Adding..." : "Add User"}
+        </Button>
+      </DialogFooter>
+    </form> {/* Form ends here */}
+  </DialogContent>
+</Dialog>
     </div>
   );
 };

@@ -254,47 +254,125 @@ const PurchaseOrders = () => {
         </Table>
       </div>
 
-      {/* Add Purchase Order Modal */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="sm:max-w-[480px]">
-          <DialogHeader>
-            <DialogTitle>Create Purchase Order</DialogTitle>
-            <DialogDescription> Select supplier, product, and enter quantity. </DialogDescription>
-          </DialogHeader>
-          <form id="add-po-form" onSubmit={handleAddOrder} className="grid gap-4 pt-4">
-            {addError && ( <div className="col-span-full p-3 bg-red-100 border border-red-300 text-red-800 rounded text-sm">{addError}</div> )}
-            <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="supplier_id" className="text-right">Supplier</Label>
-                <select id="supplier_id" name="supplier_id" value={newOrder.supplier_id} onChange={handleInputChange} className="col-span-3 border rounded px-3 py-2 bg-white" required>
-                    <option value="" disabled>Select Supplier</option>
-                    {suppliers.length > 0 ? suppliers.map(supplier => (<option key={supplier.supplier_id} value={supplier.supplier_id}>{supplier.supplier_name} (ID: {supplier.supplier_id})</option>)) : <option disabled>Loading...</option>}
-                </select>
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="product_id" className="text-right">Product</Label>
-                <select id="product_id" name="product_id" value={newOrder.product_id} onChange={handleInputChange} className="col-span-3 border rounded px-3 py-2 bg-white" required>
-                    <option value="" disabled>Select Product</option>
-                     {products.length > 0 ? products.map(product => (<option key={product.product_id} value={product.product_id}>{product.product_name} (ID: {product.product_id})</option>)) : <option disabled>Loading...</option>}
-                </select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="quantity_ordered" className="text-right">Quantity</Label>
-              <Input id="quantity_ordered" name="quantity_ordered" type="number" placeholder="0" min="1" step="1" value={newOrder.quantity_ordered} onChange={handleInputChange} className="col-span-3" required/>
-            </div>
-          </form>
-          {/* Footer outside the form */}
-          <DialogFooter className="pt-4">
-              <DialogClose asChild>
-                 <Button type="button" variant="outline">Cancel</Button>
-              </DialogClose>
-              {/* ✅ *** Corrected Button Structure *** */}
-              <Button type="submit" form="add-po-form" disabled={isAdding}>
-                  {isAdding && <FiLoader className="mr-2 h-4 w-4 animate-spin" />} {/* Render icon conditionally */}
-                  {isAdding ? "Creating..." : "Create Order"} {/* Render text content directly */}
-              </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+ {/* Add Purchase Order Modal - Dark Theme */}
+<Dialog open={showModal} onOpenChange={setShowModal}>
+  {/* Dark background for the entire modal content */}
+  <DialogContent className="sm:max-w-lg bg-gray-900 text-gray-200 rounded-lg shadow-xl overflow-hidden">
+
+    {/* Header with dark background, slightly lighter border */}
+    <DialogHeader className="px-6 py-5 bg-gray-800 border-b border-gray-700">
+      <DialogTitle className="text-lg font-medium leading-6 text-white">
+        Create Purchase Order
+      </DialogTitle>
+      <DialogDescription className="mt-1 text-sm text-gray-400">
+        Select supplier, product, and enter the quantity to order.
+      </DialogDescription>
+    </DialogHeader>
+
+    {/* Form with specific styling for dark theme */}
+    <form id="add-po-form" onSubmit={handleAddOrder} className="px-6 py-6 space-y-5">
+
+      {/* Error Message for dark theme */}
+      {addError && (
+          <div className="p-3 bg-red-900 bg-opacity-50 border border-red-500 text-red-200 rounded-md text-sm font-medium">
+              {addError}
+          </div>
+      )}
+
+      {/* Field: Supplier */}
+      <div>
+        <Label htmlFor="supplier_id" className="block text-sm font-medium text-gray-300 mb-1"> {/* Lighter label */}
+          Supplier <span className="text-red-400">*</span> {/* Lighter required star */}
+        </Label>
+        <select
+          id="supplier_id"
+          name="supplier_id"
+          value={newOrder.supplier_id}
+          onChange={handleInputChange}
+          // Dark theme select styling
+          className="block w-full pl-3 pr-10 py-2 text-base bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          required
+        >
+          {/* Style disabled/options for dark theme */}
+          <option value="" disabled className="text-gray-500">Select Supplier...</option>
+          {suppliers.length > 0 ? suppliers.map(supplier => (
+            <option key={supplier.supplier_id} value={supplier.supplier_id} className="text-white bg-gray-700">
+              {supplier.supplier_name} (ID: {supplier.supplier_id})
+            </option>
+          )) : <option disabled className="text-gray-500">Loading suppliers...</option>}
+        </select>
+      </div>
+
+      {/* Field: Product */}
+      <div>
+        <Label htmlFor="product_id" className="block text-sm font-medium text-gray-300 mb-1">
+          Product <span className="text-red-400">*</span>
+        </Label>
+        <select
+          id="product_id"
+          name="product_id"
+          value={newOrder.product_id}
+          onChange={handleInputChange}
+          // Dark theme select styling
+          className="block w-full pl-3 pr-10 py-2 text-base bg-gray-700 border border-gray-600 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          required
+        >
+          {/* Style disabled/options for dark theme */}
+          <option value="" disabled className="text-gray-500">Select Product...</option>
+          {products.length > 0 ? products.map(product => (
+            <option key={product.product_id} value={product.product_id} className="text-white bg-gray-700">
+              {product.product_name} (ID: {product.product_id})
+            </option>
+          )) : <option disabled className="text-gray-500">Loading products...</option>}
+        </select>
+      </div>
+
+      {/* Field: Quantity */}
+      <div>
+        <Label htmlFor="quantity_ordered" className="block text-sm font-medium text-gray-300 mb-1">
+          Quantity <span className="text-red-400">*</span>
+        </Label>
+        <Input
+          id="quantity_ordered"
+          name="quantity_ordered"
+          type="number"
+          placeholder="0"
+          min="1"
+          step="1"
+          value={newOrder.quantity_ordered}
+          onChange={handleInputChange}
+          // Dark theme input styling
+          className="block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder:text-gray-400"
+          required
+        />
+      </div>
+    </form>
+
+    {/* Footer with dark background and appropriate button styles */}
+    <DialogFooter className="px-6 py-4 bg-gray-800 border-t border-gray-700 flex justify-end space-x-3">
+      <DialogClose asChild>
+        {/* Outline button styled for dark theme */}
+        <Button
+          type="button"
+          variant="outline"
+          className="border-gray-600 bg-transparent text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500"
+        >
+          Cancel
+        </Button>
+      </DialogClose>
+      {/* Primary button */}
+      <Button
+        type="submit"
+        form="add-po-form"
+        disabled={isAdding}
+        className="inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500 disabled:opacity-50"
+      >
+        {isAdding && <FiLoader className="mr-2 h-4 w-4 animate-spin" />}
+        {isAdding ? "Creating..." : "Create Order"}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
     </div>
   );
 };

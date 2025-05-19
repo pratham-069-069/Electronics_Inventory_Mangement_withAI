@@ -3,16 +3,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { FiBox, FiTruck, FiAlertCircle, FiDollarSign, FiShoppingCart, FiUsers, FiFileText, FiLoader } from "react-icons/fi"; // Added FiLoader
 
 const DashboardCard = ({ title, value, icon: Icon, isLoading }) => (
-  <Card className="w-full hover:shadow-lg transition-shadow">
+  <Card className="w-full bg-gray-800 hover:shadow-lg transition-shadow">
     <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
-      <CardTitle className="text-base font-semibold text-gray-700">{title}</CardTitle>
-      <Icon className="w-5 h-5 text-gray-500" />
+      <CardTitle className="text-base font-semibold text-white">{title}</CardTitle>
+      <Icon className="w-5 h-5 text-white" />
     </CardHeader>
     <CardContent className="p-4 pt-0">
       {isLoading ? (
         <div className="h-8 w-1/2 bg-gray-200 rounded animate-pulse"></div>
       ) : (
-        <div className="text-2xl font-bold text-gray-900">{value}</div>
+        <div className="text-2xl font-bold text-white">{value}</div>
       )}
     </CardContent>
   </Card>
@@ -24,9 +24,9 @@ const Dashboard = () => {
     activeSuppliers: 0,
     lowStockAlerts: 0,
     totalSales: 0,
-    totalOrders: 0, // Initial state
-    totalUsers: 0,   // Initial state
-    totalReports: 0, // Initial state
+    totalOrders: 0,
+    totalUsers: 0,
+    totalReports: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,16 +45,15 @@ const Dashboard = () => {
         throw new Error(`Failed to fetch dashboard stats: ${response.status} ${errorText}`);
       }
       const data = await response.json();
-      // ✅ *** Update state with ALL keys returned by the backend ***
       setStats(prevStats => ({
-          ...prevStats,
-          totalProducts: data.totalProducts ?? 0,
-          activeSuppliers: data.activeSuppliers ?? 0,
-          lowStockAlerts: data.lowStockAlerts ?? 0,
-          totalSales: data.totalSales ?? 0,
-          totalOrders: data.totalOrders ?? 0,     // Use data from API
-          totalUsers: data.totalUsers ?? 0,       // Use data from API
-          totalReports: data.totalReports ?? 0,   // Use data from API
+        ...prevStats,
+        totalProducts: data.totalProducts ?? 0,
+        activeSuppliers: data.activeSuppliers ?? 0,
+        lowStockAlerts: data.lowStockAlerts ?? 0,
+        totalSales: data.totalSales ?? 0,
+        totalOrders: data.totalOrders ?? 0,
+        totalUsers: data.totalUsers ?? 0,
+        totalReports: data.totalReports ?? 0,
       }));
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -64,10 +63,9 @@ const Dashboard = () => {
     }
   };
 
-  // Format total sales nicely
   const formattedTotalSales = Number(stats.totalSales).toLocaleString('en-US', {
     style: 'currency',
-    currency: 'USD', // Adjust currency as needed
+    currency: 'USD',
   });
 
   return (
@@ -87,7 +85,6 @@ const Dashboard = () => {
           <DashboardCard title="Active Suppliers" value={stats.activeSuppliers} icon={FiTruck} isLoading={loading} />
           <DashboardCard title="Low Stock Alerts" value={stats.lowStockAlerts} icon={FiAlertCircle} isLoading={loading} />
           <DashboardCard title="Total Sales Value" value={formattedTotalSales} icon={FiDollarSign} isLoading={loading} />
-          {/* ✅ *** Titles updated to remove "(N/A)" *** */}
           <DashboardCard title="Total Orders" value={stats.totalOrders} icon={FiShoppingCart} isLoading={loading} />
           <DashboardCard title="Total Users" value={stats.totalUsers} icon={FiUsers} isLoading={loading} />
           <DashboardCard title="Reports Generated" value={stats.totalReports} icon={FiFileText} isLoading={loading} />
