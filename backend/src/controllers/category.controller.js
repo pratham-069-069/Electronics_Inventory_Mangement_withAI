@@ -8,10 +8,10 @@ import pool from '../config/db.js';
 export const getAllCategories = async (req, res) => {
     try {
         // Select only the ID and name, order alphabetically for dropdowns
-        const result = await pool.query(
+        const [results] = await pool.query( // mysql2 returns [rows, fields]
             "SELECT category_id, category_name FROM product_categories ORDER BY category_name"
         );
-        res.status(200).json(result.rows); // Send the array of categories
+        res.status(200).json(results); // Send the array of categories
     } catch (error) {
         console.error("🚨 Error fetching product categories:", error);
         res.status(500).json({ error: "Failed to fetch product categories." });

@@ -23,15 +23,15 @@ export const getInvoiceDetails = async (req, res) => {
             FROM sales s
             LEFT JOIN customers c ON s.customer_id = c.customer_id
             LEFT JOIN users u ON s.sold_by_user_id = u.user_id
-            WHERE s.sales_id = $1;
+            WHERE s.sales_id = ?;
         `;
-        const saleResult = await pool.query(saleQuery, [salesId]);
+        const [saleResult] = await pool.query(saleQuery, [salesId]); // mysql2 returns [rows, fields]
 
-        if (saleResult.rows.length === 0) {
+        if (saleResult.length === 0) {
             return res.status(404).json({ error: `Invoice with ID ${salesId} not found.` });
         }
 
-        const invoiceHeader = saleResult.rows[0];
+        const invoiceHeader = saleResult[0];
 
         // Fetch line items for the sale
         const itemsQuery = `
@@ -40,15 +40,15 @@ export const getInvoiceDetails = async (req, res) => {
                 si.unit_price, si.item_total
             FROM sales_items si
             JOIN products p ON si.product_id = p.product_id
-            WHERE si.sales_id = $1
+            WHERE si.sales_id = ?
             ORDER BY p.product_name;
         `;
-        const itemsResult = await pool.query(itemsQuery, [salesId]);
+        const [itemsResult] = await pool.query(itemsQuery, [salesId]);
 
         // Combine header and items into one response object
         const invoiceData = {
             ...invoiceHeader,
-            items: itemsResult.rows
+            items: itemsResult // itemsResult is already the array of rows
         };
 
         res.status(200).json(invoiceData);
