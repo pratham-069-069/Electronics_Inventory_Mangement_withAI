@@ -87,7 +87,7 @@ const Dashboard = () => {
           <DashboardCard title="Total Sales Value" value={formattedTotalSales} icon={FiDollarSign} isLoading={loading} />
           <DashboardCard title="Total Orders" value={stats.totalOrders} icon={FiShoppingCart} isLoading={loading} />
           <DashboardCard title="Total Users" value={stats.totalUsers} icon={FiUsers} isLoading={loading} />
-          <DashboardCard title="Reports Generated" value={stats.totalReports} icon={FiFileText} isLoading={loading} />
+          {/* <DashboardCard title="Reports Generated" value={stats.totalReports} icon={FiFileText} isLoading={loading} /> */}
         </div>
 
       </div>

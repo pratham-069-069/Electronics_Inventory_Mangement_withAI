@@ -10,7 +10,7 @@ export const getDashboardStats = async (req, res) => {
             [totalSalesRes],
             [totalOrdersRes],
             [totalUsersRes],
-            [totalReportsRes]
+            // [totalReportsRes]
         ] = await Promise.all([
             pool.query("SELECT COUNT(*) AS count FROM products"),
             pool.query("SELECT COUNT(*) AS count FROM suppliers"),
@@ -18,7 +18,7 @@ export const getDashboardStats = async (req, res) => {
             pool.query("SELECT SUM(total_amount) AS sum FROM sales WHERE payment_status = 'completed'"),
             pool.query("SELECT COUNT(*) AS count FROM purchase_orders"),
             pool.query("SELECT COUNT(*) AS count FROM users"),
-            pool.query("SELECT COUNT(*) AS count FROM reports")
+            // pool.query("SELECT COUNT(*) AS count FROM reports")
         ]);
 
         // Construct the response object
@@ -29,7 +29,7 @@ export const getDashboardStats = async (req, res) => {
             totalSales: parseFloat(totalSalesRes[0].sum || 0).toFixed(2),
             totalOrders: parseInt(totalOrdersRes[0].count, 10),
             totalUsers: parseInt(totalUsersRes[0].count, 10),
-            totalReports: parseInt(totalReportsRes[0].count, 10)
+            // totalReports: parseInt(totalReportsRes[0].count, 10)
         });
     } catch (error) {
         console.error("🚨 Error fetching dashboard stats:", error);
