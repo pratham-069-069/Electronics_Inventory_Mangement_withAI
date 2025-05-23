@@ -1,12 +1,13 @@
+// src/routes/supplier.routes.js
 import { Router } from 'express';
-import { getAllSuppliers, addSupplier, deleteSupplier } from '../controllers/supplier.controller.js';
+// Add updateSupplier to imports
+import { getAllSuppliers, addSupplier, deleteSupplier, updateSupplier } from '../controllers/supplier.controller.js';
 
 const router = Router();
 
 router.get('/', getAllSuppliers);
 router.post('/', addSupplier);
 router.delete('/:id', deleteSupplier);
-
-// Add routes for GET /:id, PUT /:id if needed
+router.put('/:id', updateSupplier); // New route for updating
 
 export default router;
